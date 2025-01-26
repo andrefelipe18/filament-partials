@@ -15,15 +15,23 @@ class FilamentPartialsCommand extends Command
     {
         $resource = $this->getResourcePath();
 
-        $this->createPartial('form', $resource);
-        $this->createPartial('table', $resource);
+        if (empty($resource)) {
+            return 1;
+        }
+
+        $this->createPartialsDirectory($resource['path']);
+
+        $namespace = $this->getNamespace($resource['path'], $resource['name']);
+
+        $this->createPartial('form', $resource, $namespace);
+        $this->createPartial('table', $resource, $namespace);
 
         $this->info('Partials created successfully.');
 
         return 0;
     }
 
-    protected function getResourcePath(): string
+    protected function getResourcePath(): array
     {
         $resource = $this->argument('resource');
 
@@ -31,46 +39,85 @@ class FilamentPartialsCommand extends Command
             $resource = $this->ask('What is the resource name?');
         }
 
-        if (! $this->isValidResourcePath($resource)) {
+        $resourcePath = $this->findResourcePath($resource);
+
+        if (empty($resourcePath)) {
             $this->error('Invalid resource path');
-            return $this->getResourcePath();
+            $this->error('Please check if the resource exists in the base resources path or in any cluster');
+            return [];
         }
 
-        return $resource;
+        return [
+            'path' => $resourcePath[0],
+            'name' => $resource,
+        ];
     }
 
-    protected function isValidResourcePath(string $resource): bool
+    protected function findResourcePath(string $resource): array
     {
         $baseResourcesPath = config('filament-partials.base_resources_path');
         $baseClustersPath = config('filament-partials.base_clusters_path');
 
         $resourcePath = base_path($baseResourcesPath . '/' . $resource);
-        $clusterResourcePath = base_path($baseClustersPath . '/*/Resources/' . $resource);
-
         if (is_dir($resourcePath)) {
-            return true;
+            return [$resourcePath];
         }
 
         $clusters = glob(base_path($baseClustersPath . '/*'), GLOB_ONLYDIR);
-
         foreach ($clusters as $cluster) {
-            if (is_dir($cluster . '/Resources/' . $resource)) {
-                return true;
+            $clusterResourcePath = $cluster . '/Resources/' . $resource;
+            if (is_dir($clusterResourcePath)) {
+                return [$clusterResourcePath];
             }
         }
 
-        return false;
+        return [];
     }
 
-    protected function createPartial(string $type, string $resource): void
+    protected function createPartialsDirectory(string $resourcePath): void
     {
-        $stubPath = __DIR__ . '/../stubs/' . $type . '.stub';
-        $partialPath = base_path(config('filament-partials.base_resources_path') . '/' . $resource . '/' . ucfirst($type) . '.php');
+        $partialsPath = $resourcePath . '/Partials';
 
-        $stub = File::get($stubPath);
-        $content = str_replace('{{ resource }}', $resource, $stub);
+        if (! is_dir($partialsPath)) {
+            File::makeDirectory($partialsPath);
+        }
+    }
 
-        File::ensureDirectoryExists(dirname($partialPath));
-        File::put($partialPath, $content);
+    protected function getNamespace(string $resourcePath, string $resourceName): string
+    {
+        $resourceFile = glob($resourcePath . '.php')[0];
+
+        $content = File::get($resourceFile);
+
+        $baseNamespace = $this->getNamespaceFromContent($content);
+
+        return "{$baseNamespace}\\{$resourceName}\\Partials";
+    }
+
+    protected function getNamespaceFromContent(string $content): string
+    {
+        $namespace = '';
+
+        preg_match('/namespace (.*);/', $content, $matches);
+
+        if (isset($matches[1])) {
+            $namespace = $matches[1];
+        }
+
+        return $namespace;
+    }
+
+    protected function createPartial(string $partial, array $resource, string $namespace): void
+    {
+        $stub = File::get(__DIR__ . '/../stubs/' . $partial . '.stub');
+
+        $stub = str_replace('{{ namespace }}', $namespace, $stub);
+        $stub = str_replace('{{ resource }}', $resource['name'], $stub);
+
+        $filename = $resource['name'] . ucfirst($partial) . '.php';
+
+        $partialPath = $resource['path'] . '/Partials/' . $filename;
+
+        File::put($partialPath, $stub);
     }
 }
