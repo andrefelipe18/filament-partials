@@ -33,6 +33,7 @@ class FilamentPartialsCommand extends Command
 
         if (! $this->isValidResourcePath($resource)) {
             $this->error('Invalid resource path');
+
             return $this->getResourcePath();
         }
 
@@ -44,17 +45,17 @@ class FilamentPartialsCommand extends Command
         $baseResourcesPath = config('filament-partials.base_resources_path');
         $baseClustersPath = config('filament-partials.base_clusters_path');
 
-        $resourcePath = base_path($baseResourcesPath . '/' . $resource);
-        $clusterResourcePath = base_path($baseClustersPath . '/*/Resources/' . $resource);
+        $resourcePath = base_path($baseResourcesPath.'/'.$resource);
+        $clusterResourcePath = base_path($baseClustersPath.'/*/Resources/'.$resource);
 
         if (is_dir($resourcePath)) {
             return true;
         }
 
-        $clusters = glob(base_path($baseClustersPath . '/*'), GLOB_ONLYDIR);
+        $clusters = glob(base_path($baseClustersPath.'/*'), GLOB_ONLYDIR);
 
         foreach ($clusters as $cluster) {
-            if (is_dir($cluster . '/Resources/' . $resource)) {
+            if (is_dir($cluster.'/Resources/'.$resource)) {
                 return true;
             }
         }
@@ -64,8 +65,8 @@ class FilamentPartialsCommand extends Command
 
     protected function createPartial(string $type, string $resource): void
     {
-        $stubPath = __DIR__ . '/../stubs/' . $type . '.stub';
-        $partialPath = base_path(config('filament-partials.base_resources_path') . '/' . $resource . '/' . ucfirst($type) . '.php');
+        $stubPath = __DIR__.'/../stubs/'.$type.'.stub';
+        $partialPath = base_path(config('filament-partials.base_resources_path').'/'.$resource.'/'.ucfirst($type).'.php');
 
         $stub = File::get($stubPath);
         $content = str_replace('{{ resource }}', $resource, $stub);
