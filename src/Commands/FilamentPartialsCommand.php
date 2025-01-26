@@ -44,6 +44,7 @@ class FilamentPartialsCommand extends Command
         if (empty($resourcePath)) {
             $this->error('Invalid resource path');
             $this->error('Please check if the resource exists in the base resources path or in any cluster');
+
             return [];
         }
 
@@ -58,14 +59,14 @@ class FilamentPartialsCommand extends Command
         $baseResourcesPath = config('filament-partials.base_resources_path');
         $baseClustersPath = config('filament-partials.base_clusters_path');
 
-        $resourcePath = base_path($baseResourcesPath . '/' . $resource);
+        $resourcePath = base_path($baseResourcesPath.'/'.$resource);
         if (is_dir($resourcePath)) {
             return [$resourcePath];
         }
 
-        $clusters = glob(base_path($baseClustersPath . '/*'), GLOB_ONLYDIR);
+        $clusters = glob(base_path($baseClustersPath.'/*'), GLOB_ONLYDIR);
         foreach ($clusters as $cluster) {
-            $clusterResourcePath = $cluster . '/Resources/' . $resource;
+            $clusterResourcePath = $cluster.'/Resources/'.$resource;
             if (is_dir($clusterResourcePath)) {
                 return [$clusterResourcePath];
             }
@@ -76,7 +77,7 @@ class FilamentPartialsCommand extends Command
 
     protected function createPartialsDirectory(string $resourcePath): void
     {
-        $partialsPath = $resourcePath . '/Partials';
+        $partialsPath = $resourcePath.'/Partials';
 
         if (! is_dir($partialsPath)) {
             File::makeDirectory($partialsPath);
@@ -85,7 +86,7 @@ class FilamentPartialsCommand extends Command
 
     protected function getNamespace(string $resourcePath, string $resourceName): string
     {
-        $resourceFile = glob($resourcePath . '.php')[0];
+        $resourceFile = glob($resourcePath.'.php')[0];
 
         $content = File::get($resourceFile);
 
@@ -109,7 +110,7 @@ class FilamentPartialsCommand extends Command
 
     protected function createPartial(string $partial, array $resource, string $namespace): void
     {
-        $stub = File::get(__DIR__ . '/../stubs/' . $partial . '.stub');
+        $stub = File::get(__DIR__.'/../stubs/'.$partial.'.stub');
 
         $modelName = str_replace('Resource', '', $resource['name']);
 
@@ -117,9 +118,9 @@ class FilamentPartialsCommand extends Command
         $stub = str_replace('{{ resource }}', $resource['name'], $stub);
         $stub = str_replace('{{ model }}', $modelName, $stub);
 
-        $filename = $resource['name'] . ucfirst($partial) . '.php';
+        $filename = $resource['name'].ucfirst($partial).'.php';
 
-        $partialPath = $resource['path'] . '/Partials/' . $filename;
+        $partialPath = $resource['path'].'/Partials/'.$filename;
 
         File::put($partialPath, $stub);
 
@@ -128,13 +129,13 @@ class FilamentPartialsCommand extends Command
 
     protected function addTraitToResource(string $resourcePath, string $resourceName, string $namespace, string $partial): void
     {
-        $resourceFile = $resourcePath . '.php';
-        $trait = "\\{$namespace}\\{$resourceName}" . ucfirst($partial);
+        $resourceFile = $resourcePath.'.php';
+        $trait = "\\{$namespace}\\{$resourceName}".ucfirst($partial);
 
         $content = File::get($resourceFile);
 
-        if (!str_contains($content, "use {$trait};")) {
-            $content = preg_replace('/(class\s+' . $resourceName . '\s+extends\s+Resource\s*\{)/', "$1\n    use {$trait};", $content);
+        if (! str_contains($content, "use {$trait};")) {
+            $content = preg_replace('/(class\s+'.$resourceName.'\s+extends\s+Resource\s*\{)/', "$1\n    use {$trait};", $content);
             File::put($resourceFile, $content);
         }
     }
