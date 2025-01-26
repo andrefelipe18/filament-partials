@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace AndreFelipe\FilamentPartials\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class FilamentPartialsCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'make:filament-partials';
 
     public $description = 'My command';
 
