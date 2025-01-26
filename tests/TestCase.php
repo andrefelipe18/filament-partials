@@ -2,9 +2,9 @@
 
 namespace AndreFelipe\FilamentPartials\Tests;
 
+use AndreFelipe\FilamentPartials\FilamentPartialsServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use AndreFelipe\FilamentPartials\FilamentPartialsServiceProvider;
 
 class TestCase extends Orchestra
 {
