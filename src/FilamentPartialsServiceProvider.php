@@ -2,9 +2,9 @@
 
 namespace AndreFelipe\FilamentPartials;
 
+use AndreFelipe\FilamentPartials\Commands\FilamentPartialsCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use AndreFelipe\FilamentPartials\Commands\FilamentPartialsCommand;
 
 class FilamentPartialsServiceProvider extends PackageServiceProvider
 {
