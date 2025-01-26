@@ -1,0 +1,19 @@
+<?php
+
+// Este arquivo é um stub que contém o modelo básico para o arquivo de partial de formulário.
+// Os placeholders devem ser substituídos pelo nome do recurso e outras informações relevantes durante a geração do arquivo.
+
+use App\Models\{{resource}};
+
+class {{resource}}Form
+{
+    public function fields()
+    {
+        return [
+            // Defina os campos do formulário aqui
+            // Exemplo:
+            // Text::make('Nome')->required(),
+            // Email::make('Email')->required(),
+        ];
+    }
+}
