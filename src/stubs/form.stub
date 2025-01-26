@@ -1,19 +1,16 @@
 <?php
 
-// Este arquivo é um stub que contém o modelo básico para o arquivo de partial de formulário.
-// Os placeholders devem ser substituídos pelo nome do recurso e outras informações relevantes durante a geração do arquivo.
+namespace {{ namespace }};
 
-use App\Models\{{resource}};
+use Filament\Forms\Form;
 
-class {{resource}}Form
+trait {{ resource }}Form
 {
-    public function fields()
-    {
-        return [
-            // Defina os campos do formulário aqui
-            // Exemplo:
-            // Text::make('Nome')->required(),
-            // Email::make('Email')->required(),
-        ];
-    }
+    public static function form(Form $form): Form
+        {
+            return $form
+                ->schema([
+                    // ...
+                ]);
+        }
 }

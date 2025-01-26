@@ -111,13 +111,31 @@ class FilamentPartialsCommand extends Command
     {
         $stub = File::get(__DIR__ . '/../stubs/' . $partial . '.stub');
 
+        $modelName = str_replace('Resource', '', $resource['name']);
+
         $stub = str_replace('{{ namespace }}', $namespace, $stub);
         $stub = str_replace('{{ resource }}', $resource['name'], $stub);
+        $stub = str_replace('{{ model }}', $modelName, $stub);
 
         $filename = $resource['name'] . ucfirst($partial) . '.php';
 
         $partialPath = $resource['path'] . '/Partials/' . $filename;
 
         File::put($partialPath, $stub);
+
+        $this->addTraitToResource($resource['path'], $resource['name'], $namespace, $partial);
+    }
+
+    protected function addTraitToResource(string $resourcePath, string $resourceName, string $namespace, string $partial): void
+    {
+        $resourceFile = $resourcePath . '.php';
+        $trait = "\\{$namespace}\\{$resourceName}" . ucfirst($partial);
+
+        $content = File::get($resourceFile);
+
+        if (!str_contains($content, "use {$trait};")) {
+            $content = preg_replace('/(class\s+' . $resourceName . '\s+extends\s+Resource\s*\{)/', "$1\n    use {$trait};", $content);
+            File::put($resourceFile, $content);
+        }
     }
 }

@@ -1,24 +1,39 @@
 <?php
 
-// Este arquivo é um stub para o partial de tabela.
-// Os placeholders devem ser substituídos durante a geração do arquivo.
-
 namespace {{ namespace }};
 
-use Filament\Tables;
+use Filament\Tables\Actions\{ActionGroup, BulkActionGroup, CreateAction, DeleteBulkAction, EditAction, DeleteAction};
+use Filament\Tables\Table;
 
-class {{ resource }}Table
+trait {{ resource }}Table
 {
-    protected static string $resource = '{{ resource }}';
+    public static function table(Table $table): Table
+        {
+            return $table
+                ->heading(__('{{ model }}'))
+                ->description(__('Manage your {{ model }}.'))
+                ->emptyStateHeading(__('No {{ model }}'))
+                ->emptyStateDescription(__('You do not have any {{ model }} yet.'))
+                ->emptyStateActions([
+                    CreateAction::make(),
+                ])
+                ->columns([
 
-    public static function table(Tables\Table $table): Tables\Table
-    {
-        return $table
-            ->columns([
-                // Defina suas colunas aqui
-            ])
-            ->filters([
-                // Defina seus filtros aqui
-            ]);
-    }
+                ])
+                ->filters([
+                    // ...
+                ])
+                ->actions([
+                    EditAction::make(),
+
+                    ActionGroup::make([
+                        DeleteAction::make(),
+                    ])
+                ])
+                ->bulkActions([
+                    BulkActionGroup::make([
+                        DeleteBulkAction::make(),
+                    ]),
+                ]);
+        }
 }
